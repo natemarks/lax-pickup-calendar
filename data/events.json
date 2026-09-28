@@ -1,0 +1,119 @@
+{
+  "_schema": {
+    "id": "Stable identifier for this event. Never shown in the calendar UI -- carried through to the generated .ics VEVENT's UID so a later sync can recognize 'this is the same event' across edits.",
+    "title": "Event name (ICS SUMMARY).",
+    "location": "Address or venue text (ICS LOCATION). If it's an http(s) URL (e.g. a Google Maps link), the calendar page renders it as a clickable link instead of plain text.",
+    "notes": "Free text: description, contact, price, etc. (ICS DESCRIPTION).",
+    "recurrenceType": "'weekly' or 'once'.",
+    "dayOfWeek": "Required when recurrenceType is 'weekly'. RRULE BYDAY code: MO, TU, WE, TH, FR, SA, SU.",
+    "startDate": "Required when recurrenceType is 'weekly'. First occurrence, YYYY-MM-DD.",
+    "endDate": "Required when recurrenceType is 'weekly'. Last occurrence (RRULE UNTIL bound), YYYY-MM-DD.",
+    "date": "Required when recurrenceType is 'once'. YYYY-MM-DD.",
+    "startTime": "HH:MM, 24-hour.",
+    "endTime": "HH:MM, 24-hour.",
+    "timezone": "IANA timezone name, e.g. America/New_York.",
+    "_seeAlso": "data/events.example.json has worked examples of both recurrenceTypes."
+  },
+  "events": [
+    {
+      "id": "swanzey-nh-pickup-tuesdays",
+      "title": "Pickup at Fieldhouse in Swanzey NH",
+      "location": "https://maps.app.goo.gl/t3bHYqM94xGmUHdy7",
+      "notes": "$80 for 8-week. $15 for drop in.",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "TU",
+      "startDate": "2026-09-22",
+      "endDate": "2026-11-10",
+      "startTime": "20:00",
+      "endTime": "21:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "bedford-nh-box-pickup-weekly",
+      "title": "Box Lacrosse Pickup Sportsplex Bedford NH",
+      "location": "https://maps.app.goo.gl/cB5kfmwR2woCwj6k9",
+      "notes": "pickup runs until league starts. use pickup to join a roster",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "MO",
+      "startDate": "2026-09-28",
+      "endDate": "2026-10-19",
+      "startTime": "20:00",
+      "endTime": "22:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "bedford-nh-box-league-weekly",
+      "title": "Box Lacrosse League Sportsplex Bedford NH",
+      "location": "https://maps.app.goo.gl/cB5kfmwR2woCwj6k9",
+      "notes": "if you aren't on a team, sign up as a free agent. https://nhsportsplex.com/mens-pickup-box-lacrosse.html",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "MO",
+      "startDate": "2026-10-26",
+      "endDate": "2026-12-14",
+      "startTime": "20:00",
+      "endTime": "22:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "norfolk-ma-box-pickup-weekly",
+      "title": "Box Lacrosse at Forekicks in Norfolk, MA",
+      "location": "https://maps.app.goo.gl/ePJLNDRteTvohCfn9",
+      "notes": "$20 runs every week except holidays",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "WE",
+      "startDate": "2026-09-16",
+      "endDate": "2027-06-23",
+      "startTime": "21:00",
+      "endTime": "22:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "goffstown-nh-pickup-weekly",
+      "title": "Pickup Lacrosse at NH Sportsdome in Goffstown, NH",
+      "location": "https://maps.app.goo.gl/JDVaanmVUxyS9vo78",
+      "notes": "$20 runs every week except holidays",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "WE",
+      "startDate": "2026-09-16",
+      "endDate": "2026-10-28",
+      "startTime": "20:00",
+      "endTime": "21:30",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "teamworks-acton-ma-weekly-pickup",
+      "title": "Teamworks Acton MA Weekly Pickup",
+      "location": "https://maps.app.goo.gl/stVPPYVR9egf8FBA8",
+      "notes": "$20 drop in. ",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "TU",
+      "startDate": "2026-09-29",
+      "endDate": "2027-06-22",
+      "startTime": "20:30",
+      "endTime": "22:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "dana-oliver-charity-tournament-10-2026",
+      "title": "Dana Oliver Charity Tournament at Teamworks Acton, MA",
+      "location": "https://maps.app.goo.gl/stVPPYVR9egf8FBA8",
+      "notes": "https://docs.google.com/document/d/11VFoYmGoRdpAZ_XpNzvqN-_JMZVau4kTY7viSETSKkE/edit?usp=sharing",
+      "recurrenceType": "once",
+      "date": "2026-10-03",
+      "startTime": "13:00",
+      "endTime": "18:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "tribe-pembroke-pickup-20261001",
+      "title": "Tribe Open pickup at Guard base in Pembroke NH",
+      "location": "https://maps.app.goo.gl/pheeujWhjs8MoKpb9",
+      "notes": "$10 drop in",
+      "recurrenceType": "once",
+      "date": "2026-10-01",
+      "startTime": "19:00",
+      "endTime": "21:00",
+      "timezone": "America/New_York"
+    }
+  ]
+}

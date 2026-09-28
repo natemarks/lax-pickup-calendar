@@ -38,6 +38,9 @@ unit-update-golden: .venv ## update golden files
 integration: .venv ## run integration tests (requires credentials)
 	source .venv/bin/activate && python3 -m pytest -v -m "integration" tests/
 
+sync-teamup: .venv ## run the one-way JSON -> Teamup calendar sync (requires .env credentials)
+	source .venv/bin/activate && python3 scripts/sync_teamup.py
+
 static-check: black-check mypy shellcheck pylint unit ## run all static checks (CI)
 
 static: black mypy shellcheck pylint unit ## run all static checks with auto-format
@@ -47,4 +50,4 @@ clean-cache: ## clean python and pytest cache data
 	@find . -type d -name __pycache__ -not -path "./.venv/*" -exec rm -rf {} + 2>/dev/null || true
 	@rm -rf .pytest_cache
 
-.PHONY: help black black-check pylint mypy shellcheck unit unit-update-golden integration static static-check clean-cache clean-venv
+.PHONY: help black black-check pylint mypy shellcheck unit unit-update-golden integration sync-teamup static static-check clean-cache clean-venv
