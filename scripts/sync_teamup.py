@@ -264,6 +264,27 @@ def load_events() -> list[dict[str, Any]]:
     return list(data["events"])
 
 
+def mass_deletion_guard_error(
+    plan: SyncPlan, mapped: dict[str, MappedEvent]
+) -> str | None:
+    """Refuse to run a plan that would delete every currently-synced
+    event while the JSON produced zero valid ones -- almost certainly
+    a broken/empty/misread data/events.json, not a deliberate "wipe my
+    whole calendar" intent (this happened for real: an unrelated bug
+    elsewhere once called the sync primitives this same way and
+    silently deleted a fully-populated real calendar). Returns an
+    error message to abort with, or None if the plan looks safe."""
+    if plan.deletes and not mapped:
+        return (
+            f"Refusing to run: {len(plan.deletes)} event(s) would be "
+            "deleted, but data/events.json produced zero valid mapped "
+            "events. This looks like a broken or empty JSON file, not "
+            "an intentional full wipe -- check the file before "
+            "re-running."
+        )
+    return None
+
+
 def main() -> int:
     """Run one full sync. Exit codes: 0 = every JSON event synced
     cleanly, 1 = at least one entry was skipped (schema problem) but
@@ -294,6 +315,10 @@ def main() -> int:
     try:
         remote_index = fetch_remote_index(client, start_date, end_date)
         plan = plan_sync(mapped, remote_index)
+        guard_error = mass_deletion_guard_error(plan, mapped)
+        if guard_error:
+            print(guard_error, file=sys.stderr)
+            return 2
         execute_sync(client, mapped, remote_index, plan)
     except TeamupApiError as err:
         print(f"Teamup API call failed, aborting sync: {err}", file=sys.stderr)

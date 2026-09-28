@@ -76,11 +76,34 @@ def client_fixture():
     return TeamupClient(calendar_key, token)
 
 
+def _fetch_fixture_index(client, start, end):
+    """fetch_remote_index, scoped down to just this test's own two
+    fixture remote_ids.
+
+    CRITICAL SAFETY BOUNDARY: plan_sync's `deletes` bucket is "anything
+    in remote_index not in mapped". This test's `mapped` only ever
+    represents its own throwaway fixtures -- if remote_index also
+    contained real synced events from data/events.json (which share
+    this calendar and commonly have occurrences in the same date
+    range), execute_sync would delete them, since they'd never appear
+    in `mapped`. This bug was real and destroyed all 8 real events in
+    production before this function existed. Filtering remote_index
+    down to only the fixture ids before it ever reaches
+    plan_sync/execute_sync makes that structurally impossible,
+    regardless of what real events currently exist on the calendar."""
+    full_index = fetch_remote_index(client, start, end)
+    return {
+        remote_id: info
+        for remote_id, info in full_index.items()
+        if remote_id in (WEEKLY_REMOTE_ID, ONCE_REMOTE_ID)
+    }
+
+
 def _cleanup(client, start, end):
     """Delete any leftover fixture events by remote_id, e.g. from a
     previous failed run, so each test starts and ends from a clean
     slate without touching real synced events."""
-    remote_index = fetch_remote_index(client, start, end)
+    remote_index = _fetch_fixture_index(client, start, end)
     for remote_id in (WEEKLY_REMOTE_ID, ONCE_REMOTE_ID):
         info = remote_index.get(remote_id)
         if info is not None:
@@ -96,9 +119,10 @@ def _create_fixtures(client, start, end):
         [_weekly_event(), _once_event()], SUBCALENDAR_ID
     )
     assert not skipped
-    remote_index = fetch_remote_index(client, start, end)
+    remote_index = _fetch_fixture_index(client, start, end)
     plan = plan_sync(mapped, remote_index)
     assert set(plan.creates) == {WEEKLY_REMOTE_ID, ONCE_REMOTE_ID}
+    assert not plan.deletes
     execute_sync(client, mapped, remote_index, plan)
 
 
@@ -113,9 +137,10 @@ def _update_fixtures(client, start, end):
         SUBCALENDAR_ID,
     )
     assert not skipped
-    remote_index = fetch_remote_index(client, start, end)
+    remote_index = _fetch_fixture_index(client, start, end)
     plan = plan_sync(mapped, remote_index)
     assert sorted(plan.updates) == sorted([WEEKLY_REMOTE_ID, ONCE_REMOTE_ID])
+    assert not plan.deletes
     execute_sync(client, mapped, remote_index, plan)
 
 
@@ -135,12 +160,12 @@ def _assert_titles_updated(client, start, end):
 def _delete_fixtures(client, start, end):
     """Sync against an empty JSON set and assert both fixtures are
     correctly classified as deletes, then confirm they're gone."""
-    remote_index = fetch_remote_index(client, start, end)
+    remote_index = _fetch_fixture_index(client, start, end)
     plan = plan_sync({}, remote_index)
     assert sorted(plan.deletes) == sorted([WEEKLY_REMOTE_ID, ONCE_REMOTE_ID])
     execute_sync(client, {}, remote_index, plan)
 
-    remote_index_after = fetch_remote_index(client, start, end)
+    remote_index_after = _fetch_fixture_index(client, start, end)
     assert WEEKLY_REMOTE_ID not in remote_index_after
     assert ONCE_REMOTE_ID not in remote_index_after
 

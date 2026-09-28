@@ -9,6 +9,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from sync_teamup import (
+    MappedEvent,
+    SyncPlan,
     build_offset_datetime,
     build_payloads,
     build_rrule,
@@ -16,6 +18,7 @@ from sync_teamup import (
     execute_sync,
     fetch_remote_index,
     map_event_to_payload,
+    mass_deletion_guard_error,
     plan_sync,
     until_utc,
 )
@@ -284,3 +287,39 @@ def test_execute_sync_deletes_recurring_series_with_redit_all():
     client.delete_event.assert_any_call("10", redit_all=True)
     client.delete_event.assert_any_call("20", redit_all=False)
     assert client.delete_event.call_count == 2
+
+
+@pytest.mark.unit
+def test_mass_deletion_guard_blocks_deletes_with_empty_mapped():
+    """A plan with deletes but zero mapped events is refused -- this is
+    exactly the shape a broken/empty data/events.json produces, and is
+    almost certainly a bug, not an intentional full wipe (this class of
+    bug once silently deleted a fully-populated real calendar)."""
+    plan = SyncPlan(creates=[], updates=[], deletes=["some-event"])
+    error = mass_deletion_guard_error(plan, mapped={})
+    assert error is not None
+    assert "zero valid mapped events" in error
+
+
+@pytest.mark.unit
+def test_mass_deletion_guard_allows_deletes_with_nonempty_mapped():
+    """A normal sync run -- some real events mapped, some deletes
+    planned for entries removed from the JSON -- is not blocked."""
+    mapped = {
+        "weekly-event-1": MappedEvent(
+            id="weekly-event-1",
+            payload={},
+            is_recurring=True,
+            effective_end_date="2026-11-10",
+        )
+    }
+    plan = SyncPlan(creates=[], updates=[], deletes=["removed-event"])
+    assert mass_deletion_guard_error(plan, mapped) is None
+
+
+@pytest.mark.unit
+def test_mass_deletion_guard_allows_no_deletes_with_empty_mapped():
+    """An empty JSON with nothing currently on Teamup to delete either
+    is not a mass-deletion risk -- nothing to guard against."""
+    plan = SyncPlan(creates=[], updates=[], deletes=[])
+    assert mass_deletion_guard_error(plan, mapped={}) is None

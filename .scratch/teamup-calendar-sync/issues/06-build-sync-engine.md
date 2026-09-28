@@ -121,4 +121,32 @@ up -- they are the actual intended output of this ticket).
 **Not yet done, flagged for the map**: per map.md's standing note, the
 first Modify-permission key's rotation was deliberately deferred until
 this ticket closed. It is closed now -- that rotation is the one
-remaining follow-up outside this ticket's own scope.
+remaining follow-up outside this ticket's own scope. (Since resolved --
+see the incident note below and map.md.)
+
+**Post-resolution incident**: running `make integration` against the
+real, populated calendar deleted all 8 real events. Root cause:
+`tests/test_integration.py`'s `_create_fixtures`/`_update_fixtures`/
+`_delete_fixtures` each called `plan_sync(mapped, remote_index)` where
+`mapped` only ever contained the test's own 2 throwaway fixtures, but
+`remote_index` (from `fetch_remote_index` over the test's date range)
+reflected the *entire* real calendar -- all 8 real events have
+occurrences in that range. `plan_sync`'s `deletes` bucket is
+"in Teamup but not in mapped", so all 8 real events were bucketed as
+deletes and silently removed by `execute_sync`, with only
+`plan.creates`/`plan.updates` ever asserted on -- nothing checked
+`plan.deletes`. The test reported "passed" throughout.
+
+Fixed two ways: (1) `tests/test_integration.py` now filters
+`remote_index` down to only the test's own fixture remote_ids via a
+new `_fetch_fixture_index` helper *before* it ever reaches
+`plan_sync`/`execute_sync`, making it structurally impossible for the
+test to see (let alone delete) anything else, regardless of what's on
+the calendar -- verified by restoring the 8 real events and re-running
+`make integration` against a populated calendar; all 8 survived. (2)
+`scripts/sync_teamup.py` gained a `mass_deletion_guard_error` check in
+`main()`: refuses to run if a plan would delete existing events while
+the JSON produced zero valid mapped events (the broken/empty-JSON
+failure mode this incident's root cause resembles), unit-tested in
+`tests/test_sync_teamup.py`. `make static` clean after both fixes (28
+unit tests, up from 25).
