@@ -1,67 +1,51 @@
 # lax-pickup-calendar
 
-Keeps a public [Teamup](https://teamup.com) calendar of MA/NH adult lacrosse pickup games and leagues in sync with a single, human-edited JSON file. The JSON file is the source of truth -- edit it, re-run the sync, and the Teamup calendar matches it exactly (events added, changed, or removed).
+Keeps a public [Teamup](https://teamup.com) calendar of MA/NH adult lacrosse pickup games and leagues in sync with `data/events.json`, the source of truth. Edit the file, run the sync, and Teamup matches it exactly.
 
-Full background: `docs/specs/public-lacrosse-calendar-site.md` (the original spec) and `docs/research/teamup-live-api-behavior.md` (how Teamup's API actually behaves, empirically confirmed).
+**View the calendar:** [natenite.net/lacrosse-calendar](https://natenite.net/lacrosse-calendar) (redirects to Teamup) or directly at [teamup.com/kso7z4zmxh7jgq15iq](https://teamup.com/kso7z4zmxh7jgq15iq).
 
-## Managing events
+## Updating events
 
-All events live in `data/events.json`. Each event is a JSON object with a stable `id` plus its schedule fields; `data/events.example.json` has the full annotated schema and worked examples of both event shapes (one-off and weekly recurring).
+1. Edit `data/events.json` -- add, change, or remove an entry in the `events` array. Schema and worked examples: `data/events.example.json`.
+2. Run `make sync-teamup`. Output: `Sync complete: N created, N updated, N deleted, N skipped.`
 
-To add, change, or remove an event:
-
-1. Edit `data/events.json` directly -- add a new object to the `events` array, change fields on an existing one, or delete an object entirely.
-2. Run the sync (see below). The Teamup calendar will end up exactly matching the file: new entries are created, changed entries are updated, and anything removed from the file is deleted from Teamup.
-
-A few things worth knowing about how entries map onto Teamup, from the live research:
-
-- `recurrenceType: "weekly"` becomes a single recurring Teamup event (one `rrule`), not one event per occurrence.
-- `notes` is sent as plain text; Teamup renders it as HTML (wraps it in `<p>...</p>`) on its end -- this is cosmetic, no action needed on your part.
-- An entry missing a required field (e.g. a weekly event with no `dayOfWeek`) is skipped and reported, never silently guessed at -- fix the entry and re-run.
-- Re-running the sync is always safe: it's idempotent, so running it again with no changes to the file reports `0 created, 0 deleted`, and existing events are simply re-confirmed.
+Notes:
+- A weekly event is written as one recurring Teamup event, not one row per occurrence.
+- An entry missing a required field is skipped and reported, never guessed at -- fix it and re-run.
+- Re-running with no changes is safe and reports all zeros; deletions are real, though -- anything removed from the JSON is deleted from Teamup on the next run.
 
 ## Setup
 
-```bash
-git clone <this repo>
-cd lax-pickup-calendar
-```
-
-Create a `.env` file at the repo root (already gitignored) with your Teamup credentials:
+Create a gitignored `.env` at the repo root:
 
 ```
-TEAMUP_TOKEN=<your Teamup API token>
-TEAMUP_CALENDAR_KEY=<your Teamup calendar's Access Key>
+TEAMUP_TOKEN=<application API token>
+TEAMUP_CALENDAR_KEY=<a Modify-permission Calendar Link key>
 ```
 
-- `TEAMUP_TOKEN`: requested for free from Teamup's [API key request form](https://teamup.com/api-keys/request).
-- `TEAMUP_CALENDAR_KEY`: a **Calendar Link** key with "Modify" (or higher) permission, scoped to just this calendar -- from the Teamup web app: blue menu (top right) -> **Settings** -> **Sharing** -> **Add User** -> expand the **Link** section -> **Add**. (Don't use a plain public/share link -- those default to read-only and can't write events.)
+- **`TEAMUP_TOKEN`**: one-time, requested free from [teamup.com/api-keys/request](https://teamup.com/api-keys/request). Not calendar-specific.
+- **`TEAMUP_CALENDAR_KEY`**: see below.
 
-**Never commit `.env` or paste its contents anywhere outside your own editor** -- a Teamup Calendar Link key is a bearer credential: whoever holds it can modify the calendar, no login required. If a key is ever exposed, revoke it in Teamup's Sharing settings and generate a replacement.
+**Never paste either value into chat, a commit, or anywhere outside `.env`** -- both are bearer credentials: whoever holds one can use it, no login required.
 
-## Running the sync
+## Generating / rotating a Calendar Link
 
-```bash
-make sync-teamup
-```
+Teamup calendar (blue menu, top right) -> **Settings** -> **Sharing** -> **Add User** -> expand the **Link** section -> **Add**. Name it, scope **Calendars Shared** to just this calendar, and pick a permission level:
 
-This reads `data/events.json`, compares it against what's currently in the Teamup calendar, and applies whatever create/update/delete calls are needed to make them match. Output looks like:
+- **Read-only** -- for the public viewing link (see top of this file). Safe to share/publish.
+- **Modify** (or higher) -- for `TEAMUP_CALENDAR_KEY` in `.env`. Required for the sync to write events; a plain read-only link cannot.
 
-```
-Sync complete: 2 created, 1 updated, 0 deleted, 0 skipped.
-```
-
-A non-zero exit code means something needs attention: skipped (malformed) entries, or a Teamup API call failing partway through.
+To rotate a key (e.g. after accidental exposure): delete the old link in the same Sharing panel, create a new one the same way, and update `.env` (or this README, for the read-only link).
 
 ## Development
 
-Static analysis and tests follow this project's standard scaffolding -- see `CLAUDE.md` for the full standards. Quick reference:
+Standards: `CLAUDE.md`. Quick reference:
 
 ```bash
 make static        # black, mypy, shellcheck, pylint, unit tests -- auto-formats
-make static-check  # same, but check-only (what CI runs)
-make unit           # unit tests only (mocked, no credentials needed)
+make static-check  # same, check-only (CI)
+make unit           # mocked unit tests, no credentials needed
 make integration    # tests against the real Teamup API (requires .env)
 ```
 
-`scripts/teamup_client.py` is a thin HTTP wrapper around Teamup's REST API. `scripts/sync_teamup.py` holds the actual sync logic: mapping JSON events to Teamup's event shape, diffing against Teamup's current state, and executing the create/update/delete plan.
+`scripts/teamup_client.py` is the HTTP layer; `scripts/sync_teamup.py` holds the JSON-to-Teamup mapping and sync logic.
