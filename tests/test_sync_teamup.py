@@ -152,14 +152,16 @@ def test_build_payloads_all_valid_has_no_skips():
 
 
 @pytest.mark.unit
-def test_compute_list_range_uses_today_and_furthest_end_date():
-    """The list range starts today and extends through the JSON's
-    furthest effective end date."""
+def test_compute_list_range_spans_earliest_start_through_furthest_end():
+    """The list range starts at the JSON's earliest start date (here
+    before today, so a past-only Teamup copy of a JSON event is still
+    seen rather than re-created into a remote_id conflict) and extends
+    through the furthest effective end date."""
     mapped, _ = build_payloads([WEEKLY_EVENT, ONCE_EVENT], SUBCALENDAR_ID)
 
     start, end = compute_list_range(mapped)
 
-    assert start == date.today().isoformat()
+    assert start == min("2026-09-22", date.today().isoformat())
     assert end == "2026-11-10"  # WEEKLY_EVENT's endDate is the furthest
 
 
@@ -310,6 +312,7 @@ def test_mass_deletion_guard_allows_deletes_with_nonempty_mapped():
             id="weekly-event-1",
             payload={},
             is_recurring=True,
+            effective_start_date="2026-09-22",
             effective_end_date="2026-11-10",
         )
     }

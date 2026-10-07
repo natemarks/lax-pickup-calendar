@@ -61,15 +61,17 @@ DEFAULT_SUBCALENDAR_ID = 16069515
 class MappedEvent:
     """One JSON event, translated into a Teamup write payload.
 
-    `effective_end_date` is the latest date this event could still
-    appear on the calendar (an `endDate` for weekly events, the `date`
-    itself for one-off events) -- used to size the `GET /events` range
-    that has to cover every currently-relevant Teamup event.
+    `effective_start_date` / `effective_end_date` bound the dates this
+    event could appear on the calendar (`startDate`/`endDate` for weekly
+    events, the `date` itself for one-off events) -- used to size the
+    `GET /events` range that has to cover every Teamup event this
+    sync might need to match by `remote_id`.
     """
 
     id: str
     payload: dict[str, Any]
     is_recurring: bool
+    effective_start_date: str
     effective_end_date: str
 
 
@@ -127,10 +129,12 @@ def map_event_to_payload(
 
     if recurrence_type == "weekly":
         schedule_date = event["startDate"]
+        effective_start_date = schedule_date
         effective_end_date = event["endDate"]
         is_recurring = True
     elif recurrence_type == "once":
         schedule_date = event["date"]
+        effective_start_date = schedule_date
         effective_end_date = event["date"]
         is_recurring = False
     else:
@@ -154,6 +158,7 @@ def map_event_to_payload(
         id=event["id"],
         payload=payload,
         is_recurring=is_recurring,
+        effective_start_date=effective_start_date,
         effective_end_date=effective_end_date,
     )
 
@@ -177,13 +182,18 @@ def build_payloads(
 
 def compute_list_range(mapped: dict[str, MappedEvent]) -> tuple[str, str]:
     """The `GET /events` range must cover every event currently on
-    Teamup that this sync might need to touch: from today (past events
-    don't need diffing) through the JSON's furthest `endDate`/`date`."""
+    Teamup that this sync might need to match by `remote_id`: from the
+    earlier of today and the JSON's earliest `startDate`/`date`, through
+    the JSON's furthest `endDate`/`date`. Starting at today alone is a
+    bug: a JSON event whose Teamup copy lies entirely in the past (e.g.
+    a one-off that was since rewritten as a weekly series) would be
+    invisible, planned as a create, and rejected with `event_not_unique`."""
     today = date.today().isoformat()
     if not mapped:
         return today, today
+    earliest = min(entry.effective_start_date for entry in mapped.values())
     furthest = max(entry.effective_end_date for entry in mapped.values())
-    return today, max(furthest, today)
+    return min(earliest, today), max(furthest, today)
 
 
 def fetch_remote_index(
