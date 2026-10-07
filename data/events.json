@@ -74,8 +74,8 @@
       "notes": "$20 runs every week except holidays",
       "recurrenceType": "weekly",
       "dayOfWeek": "WE",
-      "startDate": "2026-09-16",
-      "endDate": "2026-10-28",
+      "startDate": "2026-11-04",
+      "endDate": "2026-11-25",
       "startTime": "20:00",
       "endTime": "21:30",
       "timezone": "America/New_York"
@@ -94,23 +94,14 @@
       "timezone": "America/New_York"
     },
     {
-      "id": "dana-oliver-charity-tournament-10-2026",
-      "title": "Dana Oliver Charity Tournament at Teamworks Acton, MA",
-      "location": "https://maps.app.goo.gl/stVPPYVR9egf8FBA8",
-      "notes": "https://docs.google.com/document/d/11VFoYmGoRdpAZ_XpNzvqN-_JMZVau4kTY7viSETSKkE/edit?usp=sharing",
-      "recurrenceType": "once",
-      "date": "2026-10-03",
-      "startTime": "13:00",
-      "endTime": "18:00",
-      "timezone": "America/New_York"
-    },
-    {
       "id": "tribe-pembroke-pickup-20261001",
       "title": "Tribe Open pickup at Guard base in Pembroke NH",
       "location": "https://maps.app.goo.gl/pheeujWhjs8MoKpb9",
       "notes": "$10 drop in",
-      "recurrenceType": "once",
-      "date": "2026-10-01",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "TH",
+      "startDate": "2026-10-08",
+      "endDate": "2026-10-29",
       "startTime": "19:00",
       "endTime": "21:00",
       "timezone": "America/New_York"
