@@ -68,16 +68,29 @@
       "timezone": "America/New_York"
     },
     {
-      "id": "goffstown-nh-pickup-weekly",
-      "title": "Pickup Lacrosse at NH Sportsdome in Goffstown, NH",
-      "location": "https://maps.app.goo.gl/JDVaanmVUxyS9vo78",
-      "notes": "$20 runs every week except holidays",
+      "id": "hooksett-nh-pickup-weekly-202611",
+      "title": "Pickup Lacrosse at NH Sportsdome in Hooksett, NH",
+      "location": "https://maps.app.goo.gl/c3fXPfY1zZfhz29e6",
+      "notes": "$20",
       "recurrenceType": "weekly",
-      "dayOfWeek": "WE",
-      "startDate": "2026-11-04",
-      "endDate": "2026-11-25",
+      "dayOfWeek": "TH",
+      "startDate": "2026-11-05",
+      "endDate": "2026-11-19",
+      "startTime": "21:00",
+      "endTime": "22:30",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "hooksett-nh-pickup-weekly-202612",
+      "title": "Pickup Lacrosse at NH Sportsdome in Hooksett, NH",
+      "location": "https://maps.app.goo.gl/c3fXPfY1zZfhz29e6",
+      "notes": "$20",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "TH",
+      "startDate": "2026-12-03",
+      "endDate": "2026-12-17",
       "startTime": "20:00",
-      "endTime": "21:30",
+      "endTime": "22:00",
       "timezone": "America/New_York"
     },
     {
