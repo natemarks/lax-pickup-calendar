@@ -128,8 +128,8 @@
       "dayOfWeek": "WE",
       "startDate": "2026-10-28",
       "endDate": "2026-12-30",
-      "startTime": "21:00",
-      "endTime": "22:30",
+      "startTime": "20:00",
+      "endTime": "22:00",
       "timezone": "America/New_York"
     }
   ]
