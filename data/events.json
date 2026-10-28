@@ -126,23 +126,10 @@
       "notes": "$16 per game. Must be 18+. Capped at 21 runners. Short sticks only. No cleats. Goalies play free.",
       "recurrenceType": "weekly",
       "dayOfWeek": "WE",
-      "startDate": "2026-11-04",
-      "endDate": "2026-11-25",
+      "startDate": "2026-10-28",
+      "endDate": "2026-12-30",
       "startTime": "21:00",
       "endTime": "22:30",
-      "timezone": "America/New_York"
-    },
-    {
-      "id": "allsport-northampton-ma-box-pickup-weekly-202612",
-      "title": "Men's Pickup Box Lacrosse at Allsport Arena in Northampton, MA",
-      "location": "Allsport Arena, 54 Old Ferry Rd, Northampton, MA 01060, USA",
-      "notes": "$16 per game. Must be 18+. Capped at 21 runners. Short sticks only. No cleats. Goalies play free.",
-      "recurrenceType": "weekly",
-      "dayOfWeek": "WE",
-      "startDate": "2026-12-02",
-      "endDate": "2026-12-30",
-      "startTime": "20:00",
-      "endTime": "22:00",
       "timezone": "America/New_York"
     }
   ]
