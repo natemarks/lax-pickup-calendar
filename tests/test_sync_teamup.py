@@ -162,7 +162,8 @@ def test_compute_list_range_spans_earliest_start_through_furthest_end():
     start, end = compute_list_range(mapped)
 
     assert start == min("2026-09-22", date.today().isoformat())
-    assert end == "2026-11-10"  # WEEKLY_EVENT's endDate is the furthest
+    # WEEKLY_EVENT's endDate is the furthest, unless today is later
+    assert end == max("2026-11-10", date.today().isoformat())
 
 
 @pytest.mark.unit

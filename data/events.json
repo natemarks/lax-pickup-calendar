@@ -131,6 +131,17 @@
       "startTime": "20:00",
       "endTime": "22:00",
       "timezone": "America/New_York"
+    },
+    {
+      "id": "yuletide-classic-dayhill-dome-windsor-ct-20261227",
+      "title": "Yuletide Classic Men's Master Lacrosse Tournament at Dayhill Dome in Windsor, CT",
+      "location": "https://maps.app.goo.gl/NeYBEJDhKRLdxhPz9",
+      "notes": "$850 per team. 7v7 (2 attack, 2 midfield, 2 defense, 1 goalie), 4 guaranteed games. 40+ years old, with an exception for up to 3 players aged 35+ per team. No LSMs allowed. Contact: Chris Roberts, snslax@gmail.com",
+      "recurrenceType": "once",
+      "date": "2026-12-27",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "timezone": "America/New_York"
     }
   ]
 }
