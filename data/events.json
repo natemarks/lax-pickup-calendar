@@ -133,6 +133,19 @@
       "timezone": "America/New_York"
     },
     {
+      "id": "maples-crossing-amesbury-ma-pickup-weekly-202611",
+      "title": "Pickup Lacrosse at Maples Crossing in Amesbury, MA",
+      "location": "https://maps.app.goo.gl/LXsG5fT24B23yvQ18",
+      "notes": "Winter session 2, in the Dome. All skill levels welcome. Full gear, no drills. Individual registration, pay online only: https://www.maplescrossing.com/adult-pickup",
+      "recurrenceType": "weekly",
+      "dayOfWeek": "TH",
+      "startDate": "2026-11-19",
+      "endDate": "2027-01-28",
+      "startTime": "21:00",
+      "endTime": "22:30",
+      "timezone": "America/New_York"
+    },
+    {
       "id": "yuletide-classic-dayhill-dome-windsor-ct-20261227",
       "title": "Yuletide Classic Men's Master Lacrosse Tournament at Dayhill Dome in Windsor, CT",
       "location": "https://maps.app.goo.gl/NeYBEJDhKRLdxhPz9",
